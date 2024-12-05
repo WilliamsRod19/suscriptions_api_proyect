@@ -37,7 +37,7 @@ const Subscription = mongoose.model('ClientSubscription', new mongoose.Schema({
   paypalSubscriptionId: { type: String },
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date },
-  status: { type: String, default: 'activo', enum: ['pendiente', 'activo', 'cancelado'] }
+  status: { type: String, default: 'pending', enum: ['pending', 'active', 'cancelled'] }
 }));
 
 const SubscriptionData = mongoose.model('SubscriptionsData', new mongoose.Schema({
@@ -119,7 +119,7 @@ app.post('/api/create-subscription', async (req, res) => {
       `${process.env.PAYPAL_BASE_URL}/v1/billing/subscriptions`,
       {
         plan_id: subscriptionPlan[0].planId,
-        start_time: new Date(),
+        start_time: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
         quantity: 1,
         subscriber: {
           name: {
@@ -150,7 +150,7 @@ app.post('/api/create-subscription', async (req, res) => {
       phone,
       planId: subscriptionPlan[0].planId,
       paypalSubscriptionId: subscriptionResponse.data.id,
-      status: 'activo'
+      status: 'pending'
     });
 
     const savedSubscription = await newSubscription.save();
@@ -249,7 +249,7 @@ app.post('/api/cancel-subscription/:subscriptionId', async (req, res) => {
 
     res.json({
       message: 'Suscripción cancelada exitosamente',
-      subscriptionId: subscription[0].paypalSubscriptionId
+      subscriptionId: subscription.paypalSubscriptionId
     });
   } catch (error) {
     console.error('Error cancelando suscripción:', error.response ? error.response.data : error.message);
