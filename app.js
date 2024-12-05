@@ -138,8 +138,8 @@ app.post('/api/create-subscription', async (req, res) => {
           brand_name: 'Proyecto UmbrellaCorp',
           locale: 'es-ES',
           user_action: 'SUBSCRIBE_NOW',
-          return_url: `${process.env.APP_URL}/success`,
-          cancel_url: `${process.env.APP_URL}/cancel`
+          return_url: `http://127.0.0.1:5500/public/index.html`,
+          cancel_url: `http://127.0.0.1:5500/public/index.html`
         }
       },
       {

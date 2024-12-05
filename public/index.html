@@ -85,7 +85,7 @@
                         <h3>${plan.name}</h3>
                         <p>${plan.description}</p>
                         <p>Precio: $${plan.price}</p>
-                        <button onclick="selectPlan('${plan._id}')">Seleccionar</button>
+                        <button onclick="selectPlan('${plan.planId}')">Seleccionar</button>
                     `;
                     subscriptionsContainer.appendChild(planCard);
                 });
@@ -120,11 +120,6 @@
                 const result = await response.json();
 
                 if (result.paypalLink) {
-                    // Mostrar detalles de suscripción y redirigir a PayPal
-                    document.getElementById('subscriptionForm').classList.add('hidden');
-                    document.getElementById('subscriptionDetails').classList.remove('hidden');
-                    document.getElementById('subscriptionId').textContent = result.subscriptionId;
-
                     // Redirigir a la página de PayPal para completar suscripción
                     window.location.href = result.paypalLink;
                 } else {
@@ -170,14 +165,37 @@
                 // Volver a la vista inicial
                 document.getElementById('subscriptionDetails').classList.add('hidden');
                 document.getElementById('subscriptions').classList.remove('hidden');
+                // Cargar planes al inicio
+                loadSubscriptions();
             } catch (error) {
                 console.error('Error cancelando suscripción:', error);
                 alert('No se pudo cancelar la suscripción');
             }
         });
+        
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const responseSubscriptionId = urlParams.get('subscription_id');
 
-        // Cargar planes al inicio
-        loadSubscriptions();
+            if (responseSubscriptionId) {
+                // El usuario completó la transacción con éxito
+                alert('¡Suscripción completada exitosamente!');
+                    // Mostrar detalles de suscripción y redirigir a PayPal
+                    document.getElementById('subscriptionForm').classList.add('hidden');
+                    document.getElementById('subscriptionDetails').classList.remove('hidden');
+                    document.getElementById('subscriptionId').textContent = responseSubscriptionId.toString();
+                // Aquí podrías mostrar los detalles de la suscripción, o hacer otro flujo
+            } else if (responseSubscriptionId === 'cancelled') {
+                // El usuario canceló la transacción
+                alert('La suscripción fue cancelada.');
+                // Cargar planes al inicio
+                loadSubscriptions();
+            } else {
+                // Cargar planes al inicio
+                loadSubscriptions();
+            }
+        }
+        
     </script>
 </body>
 
