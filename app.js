@@ -38,7 +38,7 @@ const Subscription = mongoose.model('ClientSubscription', new mongoose.Schema({
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date },
   status: { type: String, default: 'pending', enum: ['pending', 'active', 'cancelled'] }
-}));
+}), 'ClientSubscription');
 
 const SubscriptionData = mongoose.model('SubscriptionsData', new mongoose.Schema({
   planId: { type: String, required: true },
