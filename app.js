@@ -3,11 +3,18 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config();
 
 // Configuración de Express y Middleware
 const app = express();
+
 app.use(bodyParser.json());
+app.use(cors({ 
+  origin: '*', 
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 

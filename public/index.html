@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,31 +13,38 @@
             padding: 20px;
             line-height: 1.6;
         }
+
         .subscription-list {
             display: grid;
             gap: 15px;
         }
+
         .subscription-card {
             border: 1px solid #ddd;
             padding: 15px;
             border-radius: 5px;
         }
+
         .subscription-form {
             margin-top: 20px;
         }
-        input, button {
+
+        input,
+        button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
         }
+
         .hidden {
             display: none;
         }
     </style>
 </head>
+
 <body>
     <h1>Planes de Suscripción</h1>
-    
+
     <!-- Lista de Suscripciones -->
     <div id="subscriptions" class="subscription-list">
         <!-- Los planes se cargarán dinámicamente aquí -->
@@ -66,10 +74,10 @@
         // Cargar planes de suscripción
         async function loadSubscriptions() {
             try {
-                const response = await fetch('/api/subscriptions');
+                const response = await fetch('http://localhost:5000/api/subscriptions');
                 const subscriptions = await response.json();
                 const subscriptionsContainer = document.getElementById('subscriptions');
-                
+
                 subscriptions.forEach(plan => {
                     const planCard = document.createElement('div');
                     planCard.classList.add('subscription-card');
@@ -101,7 +109,7 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('/api/create-subscription', {
+                const response = await fetch('http://localhost:5000/api/create-subscription', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -116,7 +124,7 @@
                     document.getElementById('subscriptionForm').classList.add('hidden');
                     document.getElementById('subscriptionDetails').classList.remove('hidden');
                     document.getElementById('subscriptionId').textContent = result.subscriptionId;
-                    
+
                     // Redirigir a la página de PayPal para completar suscripción
                     window.location.href = result.paypalLink;
                 } else {
@@ -131,9 +139,9 @@
         // Verificar estado de suscripción
         document.getElementById('checkStatusBtn').addEventListener('click', async () => {
             const subscriptionId = document.getElementById('subscriptionId').textContent;
-            
+
             try {
-                const response = await fetch(`/api/subscription-status/${subscriptionId}`);
+                const response = await fetch(`http://localhost:5000/api/subscription-status/${subscriptionId}`);
                 const result = await response.json();
 
                 alert(`Estado de suscripción: ${result.status}`);
@@ -146,19 +154,19 @@
         // Cancelar suscripción
         document.getElementById('cancelSubscriptionBtn').addEventListener('click', async () => {
             const subscriptionId = document.getElementById('subscriptionId').textContent;
-            
+
             if (!confirm('¿Estás seguro de que deseas cancelar tu suscripción?')) {
                 return;
             }
 
             try {
-                const response = await fetch(`/api/cancel-subscription/${subscriptionId}`, {
+                const response = await fetch(`http://localhost:5000/api/cancel-subscription/${subscriptionId}`, {
                     method: 'POST'
                 });
                 const result = await response.json();
 
                 alert('Suscripción cancelada exitosamente');
-                
+
                 // Volver a la vista inicial
                 document.getElementById('subscriptionDetails').classList.add('hidden');
                 document.getElementById('subscriptions').classList.remove('hidden');
@@ -170,3 +178,7 @@
 
         // Cargar planes al inicio
         loadSubscriptions();
+    </script>
+</body>
+
+</html>
