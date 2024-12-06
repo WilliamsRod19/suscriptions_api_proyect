@@ -5,8 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Suscripciones</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
+            background-color: #121212;
+            color: #fff;
             font-family: Arial, sans-serif;
             max-width: 600px;
             margin: 0 auto;
@@ -20,20 +24,38 @@
         }
 
         .subscription-card {
-            border: 1px solid #ddd;
+            background-color: #1f1f1f;
+            border: 1px solid #333;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .subscription-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
         .subscription-form {
             margin-top: 20px;
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 10px;
         }
 
         input,
         button {
-            width: 100%;
-            padding: 10px;
             margin: 10px 0;
+        }
+
+        button {
+            background-color: #6200ea;
+            color: #fff;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #3700b3;
         }
 
         .hidden {
@@ -43,160 +65,179 @@
 </head>
 
 <body>
-    <h1>Planes de Suscripción</h1>
+    <h1 class="text-center mb-4">Planes de Suscripción</h1>
 
     <!-- Lista de Suscripciones -->
     <div id="subscriptions" class="subscription-list">
         <!-- Los planes se cargarán dinámicamente aquí -->
+
     </div>
 
     <!-- Formulario de Suscripción -->
     <div id="subscriptionForm" class="subscription-form hidden">
-        <h2>Detalles de Suscripción</h2>
+        <h2 class="text-center mb-3">Detalles de Suscripción</h2>
         <form id="subscribeForm">
             <input type="hidden" id="selectedPlanId" name="planId">
-            <input type="text" id="name" name="name" placeholder="Nombre Completo" required>
-            <input type="email" id="email" name="email" placeholder="Correo Electrónico" required>
-            <input type="tel" id="phone" name="phone" placeholder="Teléfono" required>
-            <button type="submit">Suscribirse</button>
+            <div class="mb-3">
+                <input type="text" id="name" name="name" class="form-control" placeholder="Nombre Completo" required>
+            </div>
+            <div class="mb-3">
+                <input type="email" id="email" name="email" class="form-control" placeholder="Correo Electrónico"
+                    required>
+            </div>
+            <div class="mb-3">
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="Teléfono" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Suscribirse</button>
+            <a href="http://localhost:5000" class="btn btn-danger w-100">Regresar</a>
         </form>
     </div>
-
+    
     <!-- Detalles de Suscripción -->
     <div id="subscriptionDetails" class="hidden">
-        <h2>Detalles de tu Suscripción</h2>
+        <h2 class="text-center mb-3">Detalles de tu Suscripción</h2>
         <p>ID de Suscripción: <span id="subscriptionId"></span></p>
-        <button id="checkStatusBtn">Verificar Estado</button>
-        <button id="cancelSubscriptionBtn">Cancelar Suscripción</button>
+        <button id="checkStatusBtn" class="btn btn-primary w-100 mb-2">Verificar Estado</button>
+        <button id="cancelSubscriptionBtn" class="btn btn-danger w-100">Cancelar Suscripción</button>
     </div>
 
-    <script>
-        // Cargar planes de suscripción
-        async function loadSubscriptions() {
-            try {
-                const response = await fetch('http://localhost:5000/api/subscriptions');
-                const subscriptions = await response.json();
-                const subscriptionsContainer = document.getElementById('subscriptions');
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 
-                subscriptions.forEach(plan => {
-                    const planCard = document.createElement('div');
-                    planCard.classList.add('subscription-card');
-                    planCard.innerHTML = `
-                        <h3>${plan.name}</h3>
-                        <p>${plan.description}</p>
-                        <p>Precio: $${plan.price}</p>
-                        <button onclick="selectPlan('${plan.planId}')">Seleccionar</button>
-                    `;
-                    subscriptionsContainer.appendChild(planCard);
-                });
-            } catch (error) {
-                console.error('Error cargando suscripciones:', error);
-                alert('No se pudieron cargar los planes de suscripción');
-            }
+</html>
+
+
+<script>
+    // Cargar planes de suscripción
+    // Cargar planes de suscripción
+    async function loadSubscriptions() {
+        try {
+            const response = await fetch('http://localhost:5000/api/subscriptions');
+            const subscriptions = await response.json();
+            const subscriptionsContainer = document.getElementById('subscriptions');
+
+            subscriptions.forEach(plan => {
+                const planCard = document.createElement('div');
+                planCard.classList.add('subscription-card', 'bg-dark', 'text-white', 'p-3', 'rounded', 'shadow-sm');
+
+                planCard.innerHTML = `
+                <h3 class="h5">${plan.name}</h3>
+                <p class="mb-2">${plan.description}</p>
+                <p class="fw-bold">Precio: $${plan.price}</p>
+                <button onclick="selectPlan('${plan.planId}')" class="btn btn-primary w-100">Seleccionar</button>
+            `;
+                subscriptionsContainer.appendChild(planCard);
+            });
+        } catch (error) {
+            console.error('Error cargando suscripciones:', error);
+            alert('No se pudieron cargar los planes de suscripción');
         }
+    }
 
-        // Seleccionar plan
-        function selectPlan(planId) {
-            document.getElementById('selectedPlanId').value = planId;
-            document.getElementById('subscriptions').classList.add('hidden');
-            document.getElementById('subscriptionForm').classList.remove('hidden');
-        }
 
-        // Enviar suscripción
-        document.getElementById('subscribeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
+    // Seleccionar plan
+    function selectPlan(planId) {
+        document.getElementById('selectedPlanId').value = planId;
+        document.getElementById('subscriptions').classList.add('hidden');
+        document.getElementById('subscriptionForm').classList.remove('hidden');
+    }
 
-            try {
-                const response = await fetch('http://localhost:5000/api/create-subscription', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
+    // Enviar suscripción
+    document.getElementById('subscribeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
 
-                const result = await response.json();
+        try {
+            const response = await fetch('http://localhost:5000/api/create-subscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
 
-                if (result.paypalLink) {
-                    // Redirigir a la página de PayPal para completar suscripción
-                    window.location.href = result.paypalLink;
-                } else {
-                    alert('Error al crear suscripción');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('No se pudo procesar la suscripción');
-            }
-        });
+            const result = await response.json();
 
-        // Verificar estado de suscripción
-        document.getElementById('checkStatusBtn').addEventListener('click', async () => {
-            const subscriptionId = document.getElementById('subscriptionId').textContent;
-
-            try {
-                const response = await fetch(`http://localhost:5000/api/subscription-status/${subscriptionId}`);
-                const result = await response.json();
-
-                alert(`Estado de suscripción: ${result.status}`);
-            } catch (error) {
-                console.error('Error verificando estado:', error);
-                alert('No se pudo verificar el estado de la suscripción');
-            }
-        });
-
-        // Cancelar suscripción
-        document.getElementById('cancelSubscriptionBtn').addEventListener('click', async () => {
-            const subscriptionId = document.getElementById('subscriptionId').textContent;
-
-            if (!confirm('¿Estás seguro de que deseas cancelar tu suscripción?')) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`http://localhost:5000/api/cancel-subscription/${subscriptionId}`, {
-                    method: 'POST'
-                });
-                const result = await response.json();
-
-                alert('Suscripción cancelada exitosamente');
-
-                // Volver a la vista inicial
-                document.getElementById('subscriptionDetails').classList.add('hidden');
-                document.getElementById('subscriptions').classList.remove('hidden');
-                // Cargar planes al inicio
-                loadSubscriptions();
-            } catch (error) {
-                console.error('Error cancelando suscripción:', error);
-                alert('No se pudo cancelar la suscripción');
-            }
-        });
-        
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const responseSubscriptionId = urlParams.get('subscription_id');
-
-            if (responseSubscriptionId) {
-                // El usuario completó la transacción con éxito
-                alert('¡Suscripción completada exitosamente!');
-                    // Mostrar detalles de suscripción y redirigir a PayPal
-                    document.getElementById('subscriptionForm').classList.add('hidden');
-                    document.getElementById('subscriptionDetails').classList.remove('hidden');
-                    document.getElementById('subscriptionId').textContent = responseSubscriptionId.toString();
-                // Aquí podrías mostrar los detalles de la suscripción, o hacer otro flujo
-            } else if (responseSubscriptionId === 'cancelled') {
-                // El usuario canceló la transacción
-                alert('La suscripción fue cancelada.');
-                // Cargar planes al inicio
-                loadSubscriptions();
+            if (result.paypalLink) {
+                // Redirigir a la página de PayPal para completar suscripción
+                window.location.href = result.paypalLink;
             } else {
-                // Cargar planes al inicio
-                loadSubscriptions();
+                alert('Error al crear suscripción');
             }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('No se pudo procesar la suscripción');
         }
-        
-    </script>
+    });
+
+    // Verificar estado de suscripción
+    document.getElementById('checkStatusBtn').addEventListener('click', async () => {
+        const subscriptionId = document.getElementById('subscriptionId').textContent;
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/subscription-status/${subscriptionId}`);
+            const result = await response.json();
+
+            alert(`Estado de suscripción: ${result.status}`);
+        } catch (error) {
+            console.error('Error verificando estado:', error);
+            alert('No se pudo verificar el estado de la suscripción');
+        }
+    });
+
+    // Cancelar suscripción
+    document.getElementById('cancelSubscriptionBtn').addEventListener('click', async () => {
+        const subscriptionId = document.getElementById('subscriptionId').textContent;
+
+        if (!confirm('¿Estás seguro de que deseas cancelar tu suscripción?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/cancel-subscription/${subscriptionId}`, {
+                method: 'POST'
+            });
+            const result = await response.json();
+
+            alert('Suscripción cancelada exitosamente');
+
+            // Volver a la vista inicial
+            document.getElementById('subscriptionDetails').classList.add('hidden');
+            document.getElementById('subscriptions').classList.remove('hidden');
+            // Cargar planes al inicio
+            loadSubscriptions();
+        } catch (error) {
+            console.error('Error cancelando suscripción:', error);
+            alert('No se pudo cancelar la suscripción');
+        }
+    });
+
+    window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const responseSubscriptionId = urlParams.get('subscription_id');
+
+        if (responseSubscriptionId) {
+            // El usuario completó la transacción con éxito
+            alert('¡Suscripción completada exitosamente!');
+            // Mostrar detalles de suscripción y redirigir a PayPal
+            document.getElementById('subscriptionForm').classList.add('hidden');
+            document.getElementById('subscriptionDetails').classList.remove('hidden');
+            document.getElementById('subscriptionId').textContent = responseSubscriptionId.toString();
+            // Aquí podrías mostrar los detalles de la suscripción, o hacer otro flujo
+        } else if (responseSubscriptionId === 'cancelled') {
+            // El usuario canceló la transacción
+            alert('La suscripción fue cancelada.');
+            // Cargar planes al inicio
+            loadSubscriptions();
+        } else {
+            // Cargar planes al inicio
+            loadSubscriptions();
+        }
+    }
+
+</script>
 </body>
 
 </html>

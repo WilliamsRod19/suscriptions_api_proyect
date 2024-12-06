@@ -160,13 +160,15 @@ app.post('/api/create-subscription', async (req, res) => {
       status: 'pending'
     });
 
-    const savedSubscription = await newSubscription.save();
-    console.log("Después de guardar:", savedSubscription);
-
     res.json({
-      subscriptionId: newSubscription.plantId,
+      subscriptionId: newSubscription.planId,
       paypalLink: subscriptionResponse.data.links.find(link => link.rel === 'approve').href
     });
+
+    console.log('ENTENDE QUE EL ALCOHOL TE VA A MATAR')
+
+    const savedSubscription = await newSubscription.save();
+    console.log("Después de guardar:", savedSubscription);
 
   } catch (error) {
     console.error('Error creando suscripción:', error.response ? error.response.data : error.message);
