@@ -6,12 +6,11 @@ const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
-// Configuración de Express y Middleware
 const app = express();
 
 app.use(bodyParser.json());
-app.use(cors({ 
-  origin: '*', 
+app.use(cors({
+  origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -35,7 +34,6 @@ mongoose.connection.on('error', (err) => {
   mongoose.connect(process.env.MONGODB_URI);
 });
 
-// Modelos de Mongoose
 const Subscription = mongoose.model('ClientSubscription', new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
@@ -59,9 +57,9 @@ const SubscriptionData = mongoose.model('SubscriptionsData', new mongoose.Schema
 const getPayPalAccessToken = async () => {
   try {
     const auth = Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString('base64');
-    
+
     const response = await axios.post(
-      `${process.env.PAYPAL_BASE_URL}/v1/oauth2/token`, 
+      `${process.env.PAYPAL_BASE_URL}/v1/oauth2/token`,
       'grant_type=client_credentials',
       {
         headers: {
@@ -70,7 +68,7 @@ const getPayPalAccessToken = async () => {
         }
       }
     );
-    
+
     return response.data.access_token;
   } catch (error) {
     console.error('Error obteniendo token de PayPal:', error.response ? error.response.data : error.message);
@@ -78,17 +76,15 @@ const getPayPalAccessToken = async () => {
   }
 };
 
-// Rutas de Suscripciones
-
 // GET: Obtener planes de suscripción disponibles
 app.get('/api/subscriptions', async (req, res) => {
   try {
     const subscriptionsData = await SubscriptionData.find();
-    
+
     if (!subscriptionsData.length) {
       return res.status(404).json({ message: 'No hay suscripciones disponibles' });
     }
-    
+
     const response = subscriptionsData.map(plan => ({
       _id: plan._id,
       planId: plan.planId,
@@ -96,7 +92,7 @@ app.get('/api/subscriptions', async (req, res) => {
       description: plan.description,
       price: plan.price
     }));
-    
+
     res.json(response);
   } catch (error) {
     console.error('Error detallado al obtener suscripciones:', error);
@@ -111,7 +107,7 @@ app.get('/api/subscriptions', async (req, res) => {
 app.post('/api/create-subscription', async (req, res) => {
   try {
     const { name, email, phone, planId } = req.body;
-    
+
     // Obtener detalles del plan
     const subscriptionPlan = await SubscriptionData.find({ planId });
     if (!subscriptionPlan) {
@@ -183,7 +179,7 @@ app.post('/api/create-subscription', async (req, res) => {
 app.get('/api/subscription-status/:subscriptionId', async (req, res) => {
   try {
     const { subscriptionId } = req.params;
-    
+
     // Obtener suscripción de MongoDB
     const subscriptionList = await Subscription.find({ paypalSubscriptionId: subscriptionId });
     const subscription = subscriptionList[0]
@@ -228,9 +224,9 @@ app.get('/api/subscription-status/:subscriptionId', async (req, res) => {
 app.post('/api/cancel-subscription/:subscriptionId', async (req, res) => {
   try {
     const { subscriptionId } = req.params;
-    
+
     // Obtener suscripción de MongoDB
-    const subscriptionList = await Subscription.find({ paypalSubscriptionId : subscriptionId });
+    const subscriptionList = await Subscription.find({ paypalSubscriptionId: subscriptionId });
     const subscription = subscriptionList[0]
     if (!subscription) {
       return res.status(404).json({ message: 'Suscripción no encontrada' });
@@ -275,5 +271,4 @@ app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
 
-// Exportar para pruebas o uso en otros módulos
 module.exports = app;
